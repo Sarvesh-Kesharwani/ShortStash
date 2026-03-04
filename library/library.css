@@ -209,33 +209,82 @@ body {
 }
 
 /* Column widths */
-.col-thumb { width: 80px; }
+.col-refresh { width: 40px; text-align: center; }
+.col-thumb { width: 180px; }
 .col-source { width: 10%; }
 .col-category { width: 20%; }
 .col-link { width: 10%; }
 .col-date { width: 18%; }
 .col-actions { width: 10%; text-align: center; }
 
+/* Per-row refresh button */
+.col-refresh-cell {
+  text-align: center;
+}
+
+.row-refresh-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.row-refresh-btn:hover {
+  color: #a29bfe;
+  border-color: rgba(162, 155, 254, 0.3);
+  background: rgba(162, 155, 254, 0.1);
+}
+
+.row-refresh-btn.spinning svg {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Select mode checkbox */
+.select-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #6C5CE7;
+  cursor: pointer;
+}
+
+/* Refresh button select-active state */
+.action-btn.select-active {
+  background: #00b894;
+  border-color: #00b894;
+  color: white;
+}
+
 /* Thumbnail */
 .thumb-cell {
-  width: 56px;
-  height: 56px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .thumb-img {
-  width: 56px;
-  height: 56px;
+  width: 160px;
+  height: 160px;
   object-fit: cover;
   border-radius: 6px;
   background: #16213e;
 }
 
 .thumb-placeholder {
-  width: 56px;
-  height: 56px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;

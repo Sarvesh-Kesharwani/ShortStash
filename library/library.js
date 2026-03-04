@@ -2,6 +2,8 @@ let allShorts = [];
 let allCategories = [];
 let activeCategory = 'all';
 let searchQuery = '';
+let selectMode = false;
+let selectedLinks = new Set();
 
 const tableBody = document.getElementById('tableBody');
 const emptyState = document.getElementById('emptyState');
@@ -9,6 +11,7 @@ const categoryTabs = document.getElementById('categoryTabs');
 const statsRow = document.getElementById('statsRow');
 const searchInput = document.getElementById('searchInput');
 const exportBtn = document.getElementById('exportBtn');
+const refreshBtn = document.getElementById('refreshBtn');
 const manageCatsBtn = document.getElementById('manageCatsBtn');
 
 // Load data
@@ -39,6 +42,74 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+const refreshIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+
+// Refresh: toggle select mode, then refresh selected videos
+refreshBtn.addEventListener('click', () => {
+  if (allShorts.length === 0) {
+    refreshBtn.textContent = 'Nothing to refresh';
+    setTimeout(() => { refreshBtn.innerHTML = `${refreshIcon} Refresh`; }, 2000);
+    return;
+  }
+
+  if (!selectMode) {
+    // Enter select mode
+    selectMode = true;
+    selectedLinks.clear();
+    refreshBtn.innerHTML = 'Done';
+    refreshBtn.classList.add('select-active');
+    render();
+  } else {
+    // Exit select mode and refresh selected
+    selectMode = false;
+    refreshBtn.classList.remove('select-active');
+    const links = [...selectedLinks];
+    selectedLinks.clear();
+
+    if (links.length === 0) {
+      refreshBtn.innerHTML = `${refreshIcon} Refresh`;
+      render();
+      return;
+    }
+
+    refreshBtn.textContent = `Refreshing ${links.length}...`;
+    refreshBtn.disabled = true;
+    doRefresh(links);
+  }
+});
+
+function doRefresh(links) {
+  chrome.runtime.sendMessage({ type: 'REFRESH_THUMBNAILS', links }, (response) => {
+    if (response && response.done) {
+      chrome.storage.local.get(['savedShorts', 'categories'], (result) => {
+        allShorts = result.savedShorts || [];
+        allCategories = result.categories || [];
+        render();
+      });
+      refreshBtn.textContent = response.updated > 0 ? `Updated ${response.updated}` : 'No updates';
+      refreshBtn.disabled = false;
+      setTimeout(() => { refreshBtn.innerHTML = `${refreshIcon} Refresh`; }, 2000);
+    }
+  });
+}
+
+function refreshSingle(link) {
+  const btn = document.querySelector(`.row-refresh-btn[data-link="${CSS.escape(link)}"]`);
+  if (btn) {
+    btn.classList.add('spinning');
+    btn.disabled = true;
+  }
+  chrome.runtime.sendMessage({ type: 'REFRESH_THUMBNAILS', links: [link] }, (response) => {
+    if (response && response.done) {
+      chrome.storage.local.get(['savedShorts', 'categories'], (result) => {
+        allShorts = result.savedShorts || [];
+        allCategories = result.categories || [];
+        render();
+      });
+    }
+  });
+}
 
 // Manage Categories
 manageCatsBtn.addEventListener('click', openCategoryManager);
@@ -289,6 +360,12 @@ function renderTable() {
 
   tableBody.innerHTML = sorted.map((s, i) => `
     <tr>
+      <td class="col-refresh-cell">${selectMode
+        ? `<input type="checkbox" class="select-checkbox" data-link="${escapeAttr(s.link)}" ${selectedLinks.has(s.link) ? 'checked' : ''}>`
+        : `<button class="row-refresh-btn" data-link="${escapeAttr(s.link)}" title="Refresh this video">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>`
+      }</td>
       <td><div class="thumb-cell">${getThumbnailHtml(s)}</div></td>
       <td><span class="source-badge ${s.source}">${s.source === 'youtube' ? 'YT' : 'IG'}</span></td>
       <td><button class="category-badge reassign-btn ${s.category === 'Uncategorized' ? 'uncategorized' : ''}" data-link="${escapeAttr(s.link)}">${escapeHtml(s.category)}</button></td>
@@ -306,6 +383,24 @@ function renderTable() {
       const link = btn.dataset.link;
       allShorts = allShorts.filter(s => s.link !== link);
       chrome.storage.local.set({ savedShorts: allShorts }, () => render());
+    });
+  });
+
+  // Per-row refresh handlers
+  tableBody.querySelectorAll('.row-refresh-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      refreshSingle(btn.dataset.link);
+    });
+  });
+
+  // Select mode checkbox handlers
+  tableBody.querySelectorAll('.select-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        selectedLinks.add(cb.dataset.link);
+      } else {
+        selectedLinks.delete(cb.dataset.link);
+      }
     });
   });
 
@@ -360,7 +455,7 @@ function getThumbnailHtml(s) {
   }
   // Fallback for YouTube: derive from video ID
   if (s.source === 'youtube') {
-    const ytMatch = s.link && s.link.match(/\/shorts\/([^/?]+)/);
+    const ytMatch = s.link && (s.link.match(/\/shorts\/([^/?]+)/) || s.link.match(/[?&]v=([^&]+)/));
     if (ytMatch) {
       return `<img src="https://i.ytimg.com/vi/${escapeAttr(ytMatch[1])}/hqdefault.jpg" alt="" class="thumb-img" loading="lazy">`;
     }
@@ -375,7 +470,9 @@ function formatDate(isoStr) {
   const day = d.getDate().toString().padStart(2, '0');
   const mon = d.toLocaleString('en', { month: 'short' });
   const year = d.getFullYear();
-  return `${day} ${mon} ${year}`;
+  const hrs = d.getHours().toString().padStart(2, '0');
+  const mins = d.getMinutes().toString().padStart(2, '0');
+  return `${day} ${mon} ${year}, ${hrs}:${mins}`;
 }
 
 function escapeHtml(str) {

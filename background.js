@@ -67,6 +67,61 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message.type === 'REFRESH_THUMBNAILS') {
+    (async () => {
+      const result = await chrome.storage.local.get(['savedShorts']);
+      const shorts = result.savedShorts || [];
+      // Only refresh specified links (required)
+      const links = message.links;
+      if (!links || !Array.isArray(links) || links.length === 0) {
+        sendResponse({ done: true, updated: 0, total: 0 });
+        return;
+      }
+      const toRefresh = shorts.filter(s => links.includes(s.link));
+      let updated = 0;
+
+      for (const short of toRefresh) {
+        try {
+          const tab = await chrome.tabs.create({ url: short.link, active: false });
+
+          await new Promise((resolve) => {
+            function onUpdated(tabId, info) {
+              if (tabId === tab.id && info.status === 'complete') {
+                chrome.tabs.onUpdated.removeListener(onUpdated);
+                resolve();
+              }
+            }
+            chrome.tabs.onUpdated.addListener(onUpdated);
+          });
+
+          await new Promise(r => setTimeout(r, 3000));
+
+          try {
+            const info = await chrome.tabs.sendMessage(tab.id, { type: 'GET_SHORT_INFO' });
+            if (info && info.thumbnail) {
+              short.thumbnail = info.thumbnail;
+              if (info.name && info.name !== 'Untitled Short' && info.name !== 'Untitled Reel') {
+                short.name = info.name;
+              }
+              if (info.channelName && info.channelName !== 'Unknown Channel' && info.channelName !== 'Unknown User') {
+                short.channelName = info.channelName;
+              }
+              updated++;
+            }
+          } catch (e) { /* content script not available */ }
+
+          await chrome.tabs.remove(tab.id);
+        } catch (e) { /* tab failed to open */ }
+      }
+
+      if (updated > 0) {
+        await chrome.storage.local.set({ savedShorts: shorts });
+      }
+      sendResponse({ done: true, updated, total: toRefresh.length });
+    })();
+    return true;
+  }
+
   if (message.type === 'EXPORT_DATA') {
     chrome.storage.local.get(['savedShorts', 'categories'], (result) => {
       sendResponse({

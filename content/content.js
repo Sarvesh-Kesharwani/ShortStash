@@ -8,8 +8,8 @@
     if (isEnabled) startObserving();
   });
 
-  // Listen for toggle from popup
-  chrome.runtime.onMessage.addListener((message) => {
+  // Listen for messages
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'TOGGLE_EXTENSION') {
       isEnabled = message.enabled;
       if (isEnabled) {
@@ -18,6 +18,10 @@
       } else {
         cleanup();
       }
+    }
+    if (message.type === 'GET_SHORT_INFO') {
+      const info = getShortInfo();
+      sendResponse(info);
     }
   });
 
@@ -80,6 +84,39 @@
     };
   }
 
+  // --- YouTube regular video helpers ---
+  function getYouTubeVideoInfo() {
+    const url = window.location.href;
+    if (!url.includes('/watch')) return null;
+
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get('v');
+    if (!videoId) return null;
+
+    const link = `https://www.youtube.com/watch?v=${videoId}`;
+
+    const nameEl =
+      document.querySelector('yt-formatted-string.ytd-watch-metadata') ||
+      document.querySelector('h1.ytd-watch-metadata yt-formatted-string') ||
+      document.querySelector('#title h1 yt-formatted-string') ||
+      document.querySelector('h1.title');
+
+    const channelEl =
+      document.querySelector('ytd-channel-name yt-formatted-string a') ||
+      document.querySelector('ytd-channel-name a') ||
+      document.querySelector('#channel-name a');
+
+    const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+    return {
+      source: 'youtube',
+      link,
+      name: nameEl ? nameEl.textContent.trim() : 'Untitled Video',
+      channelName: channelEl ? channelEl.textContent.trim() : 'Unknown Channel',
+      thumbnail
+    };
+  }
+
   // --- Instagram Reels helpers ---
   function getInstagramReelInfo() {
     const url = window.location.href;
@@ -128,7 +165,7 @@
 
   function getShortInfo() {
     const platform = getPlatform();
-    if (platform === 'youtube') return getYouTubeShortInfo();
+    if (platform === 'youtube') return getYouTubeShortInfo() || getYouTubeVideoInfo();
     if (platform === 'instagram') return getInstagramReelInfo();
     return null;
   }
