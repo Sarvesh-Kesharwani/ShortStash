@@ -257,6 +257,10 @@ function renderTabs() {
   for (const cat of usedCategories) {
     html += `<button class="cat-tab ${activeCategory === cat ? 'active' : ''}" data-cat="${escapeAttr(cat)}">${escapeHtml(cat)}<span class="tab-count">${counts[cat]}</span></button>`;
   }
+  // Show Uncategorized tab if any exist
+  if (counts['Uncategorized']) {
+    html += `<button class="cat-tab ${activeCategory === 'Uncategorized' ? 'active' : ''}" data-cat="Uncategorized">Uncategorized<span class="tab-count">${counts['Uncategorized']}</span></button>`;
+  }
 
   categoryTabs.innerHTML = html;
 
@@ -288,7 +292,10 @@ function renderTable() {
       <td><span class="video-name" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</span></td>
       <td><span class="channel-name" title="${escapeAttr(s.channelName)}">${escapeHtml(s.channelName)}</span></td>
       <td><span class="source-badge ${s.source}">${s.source === 'youtube' ? 'YT' : 'IG'}</span></td>
-      <td><span class="category-badge">${escapeHtml(s.category)}</span></td>
+      <td>${s.category === 'Uncategorized'
+        ? `<button class="category-badge uncategorized reassign-btn" data-link="${escapeAttr(s.link)}">${escapeHtml(s.category)}</button>`
+        : `<span class="category-badge">${escapeHtml(s.category)}</span>`
+      }</td>
       <td><a href="${escapeAttr(s.link)}" target="_blank" class="video-link" title="${escapeAttr(s.link)}">Open</a></td>
       <td><span class="date-text">${formatDate(s.savedAt)}</span></td>
       <td style="text-align:center"><button class="delete-btn" data-link="${escapeAttr(s.link)}" title="Remove">
@@ -303,6 +310,49 @@ function renderTable() {
       const link = btn.dataset.link;
       allShorts = allShorts.filter(s => s.link !== link);
       chrome.storage.local.set({ savedShorts: allShorts }, () => render());
+    });
+  });
+
+  // Reassign category handlers
+  tableBody.querySelectorAll('.reassign-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Remove any existing dropdown
+      document.querySelectorAll('.reassign-dropdown').forEach(d => d.remove());
+
+      const link = btn.dataset.link;
+      const rect = btn.getBoundingClientRect();
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'reassign-dropdown';
+      dropdown.style.top = `${rect.bottom + 4}px`;
+      dropdown.style.left = `${rect.left}px`;
+
+      for (const cat of allCategories) {
+        const opt = document.createElement('button');
+        opt.className = 'reassign-option';
+        opt.textContent = cat;
+        opt.addEventListener('click', () => {
+          const short = allShorts.find(s => s.link === link);
+          if (short) {
+            short.category = cat;
+            chrome.storage.local.set({ savedShorts: allShorts }, () => render());
+          }
+          dropdown.remove();
+        });
+        dropdown.appendChild(opt);
+      }
+
+      document.body.appendChild(dropdown);
+
+      // Close on outside click
+      function closeDropdown(ev) {
+        if (!dropdown.contains(ev.target)) {
+          dropdown.remove();
+          document.removeEventListener('click', closeDropdown);
+        }
+      }
+      setTimeout(() => document.addEventListener('click', closeDropdown), 0);
     });
   });
 }

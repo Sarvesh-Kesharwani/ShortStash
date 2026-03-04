@@ -45,3 +45,9 @@
 - Renaming a category updates all saved videos with that category
 - Deleting a category with videos marks them as "Uncategorized"
 - Consistent dark theme styling with the rest of the extension
+
+## v1.2.1 — Reassign Uncategorized Videos
+
+- Uncategorized videos now show a red badge that is clickable
+- Clicking it opens a dropdown to reassign the video to any existing category
+- Uncategorized tab appears in the filter bar when such videos exist
