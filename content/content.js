@@ -14,7 +14,7 @@
       isEnabled = message.enabled;
       if (isEnabled) {
         startObserving();
-        injectButtons();
+        injectButtonsForCurrentPage();
       } else {
         cleanup();
       }
@@ -173,23 +173,10 @@
   // --- Plus Button ---
   function injectButtons() {
     if (!isEnabled) return;
-    // Remove existing buttons first
     document.querySelectorAll('.shortstash-save-btn').forEach(el => el.remove());
-
     const info = getShortInfo();
     if (!info) return;
-
-    const btn = document.createElement('button');
-    btn.className = 'shortstash-save-btn';
-    btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-    btn.title = 'Save with ShortStash';
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      showCategoryPicker(info);
-    });
-
-    document.body.appendChild(btn);
+    injectSaveButton(info);
   }
 
   // --- Category Picker Overlay ---
@@ -335,20 +322,80 @@
   // --- MutationObserver for SPA navigation ---
   let observer = null;
   let lastUrl = window.location.href;
+  let retryTimerId = null;
+
+  // Route injection based on page type
+  function injectButtonsForCurrentPage() {
+    if (retryTimerId !== null) {
+      clearTimeout(retryTimerId);
+      retryTimerId = null;
+    }
+    if (!isEnabled) return;
+    if (window.location.href.includes('/watch')) {
+      scheduleWatchInject(0);
+    } else {
+      setTimeout(injectButtons, 500);
+    }
+  }
+
+  // Retry injection on watch pages until button survives YouTube's DOM hydration
+  function scheduleWatchInject(attempt) {
+    const MAX_ATTEMPTS = 8;
+    const INTERVAL = 700;
+
+    document.querySelectorAll('.shortstash-save-btn').forEach(el => el.remove());
+    const info = getYouTubeVideoInfo();
+    if (!info) return; // navigated away
+
+    injectSaveButton(info);
+
+    if (attempt < MAX_ATTEMPTS) {
+      retryTimerId = setTimeout(() => {
+        retryTimerId = null;
+        if (!isEnabled || !window.location.href.includes('/watch')) return;
+        const buttonGone = !document.querySelector('.shortstash-save-btn');
+        const freshInfo = getYouTubeVideoInfo();
+        const titleStillLoading = !freshInfo || freshInfo.name === 'Untitled Video';
+        // Keep retrying if button was removed OR title is still loading (first 4 attempts)
+        if (buttonGone || (titleStillLoading && attempt < 4)) {
+          scheduleWatchInject(attempt + 1);
+        }
+      }, INTERVAL);
+    }
+  }
+
+  // Shared button factory
+  function injectSaveButton(info) {
+    const btn = document.createElement('button');
+    btn.className = 'shortstash-save-btn';
+    btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    btn.title = 'Save with ShortStash';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      // Get fresh info at click time so title/channel are up-to-date
+      showCategoryPicker(getShortInfo() || info);
+    });
+    document.body.appendChild(btn);
+  }
 
   function startObserving() {
     if (observer) return;
     observer = new MutationObserver(() => {
       if (window.location.href !== lastUrl) {
         lastUrl = window.location.href;
-        setTimeout(injectButtons, 500);
+        injectButtonsForCurrentPage();
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    injectButtons();
+    injectButtonsForCurrentPage();
   }
 
   function cleanup() {
+    if (retryTimerId !== null) {
+      clearTimeout(retryTimerId);
+      retryTimerId = null;
+    }
     document.querySelectorAll('.shortstash-save-btn').forEach(el => el.remove());
     if (currentOverlay) {
       currentOverlay.remove();

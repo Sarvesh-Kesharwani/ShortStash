@@ -1,36 +1,42 @@
 {
-  "manifest_version": 3,
-  "name": "ShortStash",
-  "version": "1.3.1",
-  "description": "Save and categorize YouTube Shorts and Instagram Reels",
-  "permissions": ["storage", "activeTab"],
-  "action": {
-    "default_popup": "popup/popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.youtube.com/*",
-        "https://youtube.com/*",
-        "https://www.instagram.com/*",
-        "https://instagram.com/*"
-      ],
-      "js": ["content/content.js"],
-      "css": ["content/content.css"],
-      "run_at": "document_idle"
-    }
-  ]
+    "manifest_version": 3,
+    "name": "ShortStash",
+    "version": "1.4.0",
+    "description": "Save and categorize YouTube Shorts and Instagram Reels",
+    "permissions": ["storage", "activeTab", "identity"],
+    "oauth2": {
+        "client_id": "862593605202-2pebov29ujt0u5jej5bm1ub3tsd017r9.apps.googleusercontent.com",
+        "scopes": ["https://www.googleapis.com/auth/drive.file"]
+    },
+    "host_permissions": [
+        "https://www.googleapis.com/*",
+        "https://accounts.google.com/*"
+    ],
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [{
+        "matches": [
+            "https://www.youtube.com/*",
+            "https://youtube.com/*",
+            "https://www.instagram.com/*",
+            "https://instagram.com/*"
+        ],
+        "js": ["content/content.js"],
+        "css": ["content/content.css"],
+        "run_at": "document_idle"
+    }]
 }

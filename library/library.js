@@ -13,12 +13,18 @@ const searchInput = document.getElementById('searchInput');
 const exportBtn = document.getElementById('exportBtn');
 const refreshBtn = document.getElementById('refreshBtn');
 const manageCatsBtn = document.getElementById('manageCatsBtn');
+const driveSection = document.getElementById('driveSection');
 
 // Load data
 chrome.storage.local.get(['savedShorts', 'categories'], (result) => {
   allShorts = result.savedShorts || [];
   allCategories = result.categories || [];
   render();
+});
+
+// Check Drive sign-in state on load
+chrome.runtime.sendMessage({ type: 'DRIVE_STATUS' }, (resp) => {
+  renderDriveSection(resp && resp.signedIn);
 });
 
 // Search
@@ -483,4 +489,98 @@ function escapeHtml(str) {
 
 function escapeAttr(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// --- Google Drive ---
+
+const driveCloudIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`;
+const driveRestoreIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 16 12 12 16 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`;
+
+function renderDriveSection(signedIn) {
+  if (signedIn) {
+    driveSection.innerHTML = `
+      <button class="action-btn drive-backup-btn" id="driveBackupBtn">${driveCloudIcon} Backup</button>
+      <button class="action-btn drive-restore-btn" id="driveRestoreBtn">${driveRestoreIcon} Restore</button>
+      <button class="action-btn drive-signout-btn" id="driveSignOutBtn">Sign Out</button>
+    `;
+    document.getElementById('driveBackupBtn').addEventListener('click', handleDriveBackup);
+    document.getElementById('driveRestoreBtn').addEventListener('click', handleDriveRestore);
+    document.getElementById('driveSignOutBtn').addEventListener('click', handleDriveSignOut);
+  } else {
+    driveSection.innerHTML = `
+      <button class="action-btn drive-backup-btn" id="driveSignInBtn">${driveCloudIcon} Sign In</button>
+    `;
+    document.getElementById('driveSignInBtn').addEventListener('click', handleDriveSignIn);
+  }
+}
+
+function handleDriveSignIn() {
+  const btn = document.getElementById('driveSignInBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
+  chrome.runtime.sendMessage({ type: 'DRIVE_SIGN_IN' }, (resp) => {
+    if (resp && resp.success) {
+      renderDriveSection(true);
+      showDriveToast('Signed in to Google Drive');
+    } else {
+      const err = (resp && resp.error) || 'Unknown error';
+      showDriveToast(`Sign in failed: ${err}`, 'error');
+      renderDriveSection(false);
+    }
+  });
+}
+
+function handleDriveBackup() {
+  const btn = document.getElementById('driveBackupBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  chrome.runtime.sendMessage({ type: 'DRIVE_BACKUP' }, (resp) => {
+    if (btn) { btn.disabled = false; btn.innerHTML = `${driveCloudIcon} Backup`; }
+    if (resp && resp.success) {
+      showDriveToast(`Backed up to Drive (${new Date(resp.backedUpAt).toLocaleString()})`);
+    } else {
+      const err = (resp && resp.error) || 'Unknown error';
+      showDriveToast(`Backup failed: ${err}`, 'error');
+    }
+  });
+}
+
+function handleDriveRestore() {
+  if (!confirm('Restore from Google Drive? This will replace your current library with the backup.')) return;
+  const btn = document.getElementById('driveRestoreBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Restoring...'; }
+
+  chrome.runtime.sendMessage({ type: 'DRIVE_RESTORE' }, (resp) => {
+    if (resp && resp.success) {
+      allShorts = resp.savedShorts;
+      allCategories = resp.categories;
+      render();
+      const ts = resp.backedUpAt ? ` (backed up ${new Date(resp.backedUpAt).toLocaleString()})` : '';
+      showDriveToast(`Restored ${resp.savedShorts.length} videos from Drive${ts}`);
+      renderDriveSection(true);
+    } else {
+      const err = (resp && resp.error) || 'Unknown error';
+      showDriveToast(`Restore failed: ${err}`, 'error');
+      renderDriveSection(true);
+    }
+  });
+}
+
+function handleDriveSignOut() {
+  chrome.runtime.sendMessage({ type: 'DRIVE_SIGN_OUT' }, () => {
+    renderDriveSection(false);
+    showDriveToast('Signed out of Google Drive');
+  });
+}
+
+function showDriveToast(msg, type = 'success') {
+  document.querySelectorAll('.drive-toast').forEach(t => t.remove());
+  const toast = document.createElement('div');
+  toast.className = `drive-toast ${type}`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }

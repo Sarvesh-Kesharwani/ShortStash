@@ -619,3 +619,80 @@ body {
 .cat-manager-add-btn:hover {
   background: #00a381;
 }
+
+/* Google Drive buttons */
+.drive-backup-btn {
+  border-color: #4285F4 !important;
+  color: #4285F4 !important;
+}
+
+.drive-backup-btn:hover {
+  background: #4285F4 !important;
+  border-color: #4285F4 !important;
+  color: white !important;
+}
+
+.drive-restore-btn {
+  border-color: #00b894 !important;
+  color: #00b894 !important;
+}
+
+.drive-restore-btn:hover {
+  background: #00b894 !important;
+  border-color: #00b894 !important;
+  color: white !important;
+}
+
+.drive-signout-btn {
+  border-color: #444 !important;
+  color: #666 !important;
+  font-size: 11px !important;
+  padding: 8px 10px !important;
+}
+
+.drive-signout-btn:hover {
+  background: rgba(255, 107, 107, 0.1) !important;
+  border-color: #ff6b6b !important;
+  color: #ff6b6b !important;
+}
+
+/* Drive toast */
+.drive-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 10002;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  max-width: 380px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+}
+
+.drive-toast.success {
+  background: #00b894;
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.4);
+}
+
+.drive-toast.error {
+  background: #ff6b6b;
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+}
+
+.drive-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#driveSection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
