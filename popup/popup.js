@@ -21,3 +21,8 @@ function updateLabel(enabled) {
   statusLabel.textContent = enabled ? 'Enabled' : 'Disabled';
   statusLabel.classList.toggle('active', enabled);
 }
+
+// Open library in a new window
+document.getElementById('openLibrary').addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('library/library.html') });
+});

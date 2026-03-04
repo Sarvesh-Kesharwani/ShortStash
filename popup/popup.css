@@ -105,3 +105,29 @@ input:checked + .slider {
 input:checked + .slider::before {
   transform: translateX(20px);
 }
+
+/* Library button */
+.library-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 16px;
+  border: 1px solid #2d2d52;
+  border-radius: 10px;
+  background: #16213e;
+  color: #a29bfe;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.library-btn:hover {
+  background: #6C5CE7;
+  border-color: #6C5CE7;
+  color: white;
+}

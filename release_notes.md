@@ -19,3 +19,14 @@
 - Fixed new category input not responding to Enter key on YouTube/Instagram (sites were capturing keyboard events)
 - Added blur handler so clicking outside the input also saves the new category and the video
 - Keyboard events now stop propagation to prevent platform interference
+
+## v1.1.0 — Library View
+
+- Added "My Library" button in the extension popup
+- Opens a full-page library view in a new tab showing all saved videos
+- Category-wise filtering via tab buttons with counts
+- Search across video names, channels, and categories
+- Stats row showing total saved, YouTube count, Instagram count, and category count
+- Delete individual entries from the library
+- Export all data as a downloadable JSON file
+- Consistent dark theme matching the extension design

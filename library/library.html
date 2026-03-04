@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="library.css">
+  <title>ShortStash — My Library</title>
+</head>
+<body>
+  <div class="container">
+    <header class="top-bar">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="ShortStash" class="brand-logo">
+        <h1>My Library</h1>
+      </div>
+      <div class="top-actions">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search videos...">
+        <button id="exportBtn" class="action-btn export-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export JSON
+        </button>
+      </div>
+    </header>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <nav class="category-tabs" id="categoryTabs"></nav>
+
+    <div class="table-wrapper">
+      <table class="library-table">
+        <thead>
+          <tr>
+            <th class="col-name">Name</th>
+            <th class="col-channel">Channel</th>
+            <th class="col-source">Source</th>
+            <th class="col-category">Category</th>
+            <th class="col-date">Saved</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </div>
+        <p>No saved videos yet.</p>
+        <p class="empty-hint">Enable ShortStash and save some Shorts or Reels!</p>
+      </div>
+    </div>
+  </div>
+  <script src="library.js"></script>
+</body>
+</html>

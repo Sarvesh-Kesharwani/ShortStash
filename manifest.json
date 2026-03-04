@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ShortStash",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Save and categorize YouTube Shorts and Instagram Reels",
   "permissions": ["storage", "activeTab"],
   "action": {
