@@ -36,3 +36,12 @@
 - Fixed video title and channel name not being extracted on YouTube Shorts (updated DOM selectors, now scopes to the active/visible reel renderer)
 - Improved Instagram Reels selectors for username and caption extraction
 - Added separate "Link" column in the library table so the video URL is always visible and clickable
+
+## v1.2.0 — Category Manager
+
+- Added "Categories" button in the library top bar
+- Opens a modal to manage all categories: view, rename, delete, and add new ones
+- Each category shows its video count
+- Renaming a category updates all saved videos with that category
+- Deleting a category with videos marks them as "Uncategorized"
+- Consistent dark theme styling with the rest of the extension

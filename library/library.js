@@ -9,6 +9,7 @@ const categoryTabs = document.getElementById('categoryTabs');
 const statsRow = document.getElementById('statsRow');
 const searchInput = document.getElementById('searchInput');
 const exportBtn = document.getElementById('exportBtn');
+const manageCatsBtn = document.getElementById('manageCatsBtn');
 
 // Load data
 chrome.storage.local.get(['savedShorts', 'categories'], (result) => {
@@ -38,6 +39,163 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+// Manage Categories
+manageCatsBtn.addEventListener('click', openCategoryManager);
+
+function openCategoryManager() {
+  // Remove existing modal if any
+  const existing = document.querySelector('.cat-manager-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'cat-manager-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'cat-manager-modal';
+
+  modal.innerHTML = `
+    <div class="cat-manager-header">
+      <span class="cat-manager-title">Manage Categories</span>
+      <button class="cat-manager-close">&times;</button>
+    </div>
+    <div class="cat-manager-list" id="catManagerList"></div>
+    <div class="cat-manager-add-row">
+      <input type="text" class="cat-manager-input" id="newCatInput" placeholder="New category name..." maxlength="30">
+      <button class="cat-manager-add-btn" id="addCatBtn">Add</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  renderCategoryList();
+
+  // Close handlers
+  modal.querySelector('.cat-manager-close').addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  // Add category
+  const newCatInput = document.getElementById('newCatInput');
+  const addCatBtn = document.getElementById('addCatBtn');
+
+  function addNewCategory() {
+    const name = newCatInput.value.trim();
+    if (!name) return;
+    if (allCategories.includes(name)) {
+      newCatInput.value = '';
+      return;
+    }
+    allCategories.push(name);
+    saveCategories();
+    newCatInput.value = '';
+    renderCategoryList();
+  }
+
+  addCatBtn.addEventListener('click', addNewCategory);
+  newCatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addNewCategory();
+  });
+}
+
+function renderCategoryList() {
+  const list = document.getElementById('catManagerList');
+  if (!list) return;
+
+  // Count usage per category
+  const counts = {};
+  for (const s of allShorts) {
+    counts[s.category] = (counts[s.category] || 0) + 1;
+  }
+
+  if (allCategories.length === 0) {
+    list.innerHTML = '<div class="cat-manager-empty">No categories yet.</div>';
+    return;
+  }
+
+  list.innerHTML = allCategories.map((cat, i) => `
+    <div class="cat-manager-item" data-index="${i}">
+      <span class="cat-manager-name">${escapeHtml(cat)}</span>
+      <span class="cat-manager-count">${counts[cat] || 0} videos</span>
+      <div class="cat-manager-actions">
+        <button class="cat-mgr-btn cat-rename-btn" data-cat="${escapeAttr(cat)}" title="Rename">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="cat-mgr-btn cat-delete-btn" data-cat="${escapeAttr(cat)}" title="Delete">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Rename handlers
+  list.querySelectorAll('.cat-rename-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const oldName = btn.dataset.cat;
+      const item = btn.closest('.cat-manager-item');
+      const nameSpan = item.querySelector('.cat-manager-name');
+      const input = document.createElement('input');
+      input.className = 'cat-manager-rename-input';
+      input.value = oldName;
+      input.maxLength = 30;
+      nameSpan.replaceWith(input);
+      input.focus();
+      input.select();
+
+      function commitRename() {
+        const newName = input.value.trim();
+        if (newName && newName !== oldName && !allCategories.includes(newName)) {
+          const idx = allCategories.indexOf(oldName);
+          if (idx !== -1) allCategories[idx] = newName;
+          // Update all shorts with old category
+          allShorts.forEach(s => {
+            if (s.category === oldName) s.category = newName;
+          });
+          chrome.storage.local.set({ savedShorts: allShorts });
+          saveCategories();
+          if (activeCategory === oldName) activeCategory = newName;
+          render();
+        }
+        renderCategoryList();
+      }
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') commitRename();
+        if (e.key === 'Escape') renderCategoryList();
+      });
+      input.addEventListener('blur', commitRename);
+    });
+  });
+
+  // Delete handlers
+  list.querySelectorAll('.cat-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat;
+      const count = counts[cat] || 0;
+      const msg = count > 0
+        ? `Delete "${cat}"? ${count} video(s) in this category will become uncategorized.`
+        : `Delete "${cat}"?`;
+      if (!confirm(msg)) return;
+      allCategories = allCategories.filter(c => c !== cat);
+      if (count > 0) {
+        allShorts.forEach(s => {
+          if (s.category === cat) s.category = 'Uncategorized';
+        });
+        chrome.storage.local.set({ savedShorts: allShorts });
+      }
+      saveCategories();
+      if (activeCategory === cat) activeCategory = 'all';
+      render();
+      renderCategoryList();
+    });
+  });
+}
+
+function saveCategories() {
+  chrome.storage.local.set({ categories: allCategories });
+}
 
 function render() {
   renderStats();

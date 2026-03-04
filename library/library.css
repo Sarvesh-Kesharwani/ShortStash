@@ -337,3 +337,178 @@ body {
   font-size: 12px !important;
   color: #444 !important;
 }
+
+/* Category Manager Modal */
+.cat-manager-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.cat-manager-modal {
+  background: #1a1a2e;
+  border: 1px solid #2d2d52;
+  border-radius: 16px;
+  width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.cat-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid #2d2d52;
+}
+
+.cat-manager-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #a29bfe;
+}
+
+.cat-manager-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.cat-manager-close:hover {
+  color: #eee;
+}
+
+.cat-manager-list {
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 8px 0;
+}
+
+.cat-manager-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  gap: 10px;
+  transition: background 0.15s;
+}
+
+.cat-manager-item:hover {
+  background: #16213e;
+}
+
+.cat-manager-name {
+  flex: 1;
+  font-size: 14px;
+  color: #eee;
+  font-weight: 500;
+}
+
+.cat-manager-count {
+  font-size: 11px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.cat-manager-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.cat-mgr-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.cat-rename-btn:hover {
+  color: #a29bfe;
+  border-color: rgba(162, 155, 254, 0.3);
+  background: rgba(162, 155, 254, 0.1);
+}
+
+.cat-delete-btn:hover {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.cat-manager-rename-input {
+  flex: 1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #6C5CE7;
+  background: #16213e;
+  color: #eee;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.cat-manager-empty {
+  padding: 30px 20px;
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+}
+
+.cat-manager-add-row {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid #2d2d52;
+}
+
+.cat-manager-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #2d2d52;
+  background: #16213e;
+  color: #eee;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cat-manager-input:focus {
+  border-color: #6C5CE7;
+}
+
+.cat-manager-input::placeholder {
+  color: #555;
+}
+
+.cat-manager-add-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #00b894;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cat-manager-add-btn:hover {
+  background: #00a381;
+}
