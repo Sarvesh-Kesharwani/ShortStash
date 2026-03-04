@@ -29,18 +29,43 @@
     return null;
   }
 
+  // --- Find the active/visible reel renderer ---
+  function getActiveShortRenderer() {
+    const renderers = document.querySelectorAll('ytd-reel-video-renderer');
+    for (const r of renderers) {
+      const rect = r.getBoundingClientRect();
+      // The visible one occupies most of the viewport
+      if (rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+        return r;
+      }
+    }
+    return renderers[0] || null;
+  }
+
   // --- YouTube Shorts helpers ---
   function getYouTubeShortInfo() {
     const url = window.location.href;
     if (!url.includes('/shorts/')) return null;
 
     const link = url.split('?')[0];
-    const nameEl = document.querySelector(
-      'yt-shorts-video-title-view-model .yt-core-attributed-string'
-    ) || document.querySelector('#title h2') || document.querySelector('h2.title');
-    const channelEl = document.querySelector(
-      'ytd-channel-name yt-formatted-string a'
-    ) || document.querySelector('.ytd-channel-name a');
+    const renderer = getActiveShortRenderer();
+    const scope = renderer || document;
+
+    // Title: try multiple known selectors
+    const nameEl =
+      scope.querySelector('yt-formatted-string#video-title') ||
+      scope.querySelector('.title.ytd-reel-player-header-renderer') ||
+      scope.querySelector('yt-shorts-video-title-view-model .yt-core-attributed-string') ||
+      scope.querySelector('#title h2') ||
+      document.querySelector('yt-formatted-string#video-title');
+
+    // Channel: try multiple known selectors
+    const channelEl =
+      scope.querySelector('yt-formatted-string.ytd-channel-name a') ||
+      scope.querySelector('yt-formatted-string.ytd-channel-name') ||
+      scope.querySelector('ytd-channel-name a') ||
+      scope.querySelector('.ytd-channel-name a') ||
+      document.querySelector('ytd-channel-name yt-formatted-string a');
 
     return {
       source: 'youtube',
@@ -56,10 +81,18 @@
     if (!url.includes('/reel') && !url.includes('/reels')) return null;
 
     const link = url.split('?')[0];
-    const userEl = document.querySelector(
-      'header a.x1i10hfl[role="link"]'
-    ) || document.querySelector('a[href*="/"] span');
-    const captionEl = document.querySelector('h1') || document.querySelector('span[dir="auto"]');
+
+    // Channel: look for username links near the reel
+    const userEl =
+      document.querySelector('header a[role="link"] span') ||
+      document.querySelector('a[role="link"] > span[dir="auto"]') ||
+      document.querySelector('header a.x1i10hfl[role="link"]');
+
+    // Caption/title
+    const captionEl =
+      document.querySelector('h1._ap3a') ||
+      document.querySelector('h1') ||
+      document.querySelector('span[dir="auto"]._ap3a');
 
     return {
       source: 'instagram',

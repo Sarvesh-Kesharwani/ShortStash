@@ -127,10 +127,11 @@ function renderTable() {
 
   tableBody.innerHTML = sorted.map((s, i) => `
     <tr>
-      <td><a href="${escapeAttr(s.link)}" target="_blank" class="video-link" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</a></td>
+      <td><span class="video-name" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</span></td>
       <td><span class="channel-name" title="${escapeAttr(s.channelName)}">${escapeHtml(s.channelName)}</span></td>
       <td><span class="source-badge ${s.source}">${s.source === 'youtube' ? 'YT' : 'IG'}</span></td>
       <td><span class="category-badge">${escapeHtml(s.category)}</span></td>
+      <td><a href="${escapeAttr(s.link)}" target="_blank" class="video-link" title="${escapeAttr(s.link)}">Open</a></td>
       <td><span class="date-text">${formatDate(s.savedAt)}</span></td>
       <td style="text-align:center"><button class="delete-btn" data-link="${escapeAttr(s.link)}" title="Remove">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>

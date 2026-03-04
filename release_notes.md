@@ -30,3 +30,9 @@
 - Delete individual entries from the library
 - Export all data as a downloadable JSON file
 - Consistent dark theme matching the extension design
+
+## v1.1.1 — Bug Fixes
+
+- Fixed video title and channel name not being extracted on YouTube Shorts (updated DOM selectors, now scopes to the active/visible reel renderer)
+- Improved Instagram Reels selectors for username and caption extraction
+- Added separate "Link" column in the library table so the video URL is always visible and clickable

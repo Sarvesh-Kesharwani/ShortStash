@@ -209,28 +209,37 @@ body {
 }
 
 /* Column widths */
-.col-name { width: 30%; }
-.col-channel { width: 18%; }
-.col-source { width: 10%; }
+.col-name { width: 26%; }
+.col-channel { width: 16%; }
+.col-source { width: 8%; }
 .col-category { width: 14%; }
+.col-link { width: 8%; }
 .col-date { width: 14%; }
 .col-actions { width: 14%; text-align: center; }
 
-/* Name link */
-.video-link {
+/* Name */
+.video-name {
   color: #eee;
-  text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 260px;
+  max-width: 240px;
+}
+
+/* Link */
+.video-link {
+  color: #a29bfe;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+  transition: color 0.2s;
 }
 
 .video-link:hover {
-  color: #a29bfe;
+  color: #6C5CE7;
+  text-decoration: underline;
 }
 
 /* Channel */
