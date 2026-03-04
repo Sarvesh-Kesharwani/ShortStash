@@ -265,10 +265,10 @@
   function saveShort(info, category, overlay) {
     const data = { ...info, category };
     chrome.runtime.sendMessage({ type: 'SAVE_SHORT', data }, (response) => {
-      if (response && response.success) {
+      if (response && response.success && response.updated) {
+        showToast('Updated!');
+      } else if (response && response.success) {
         showToast('Saved!');
-      } else if (response && response.reason === 'duplicate') {
-        showToast('Already saved!');
       }
       overlay.remove();
       currentOverlay = null;

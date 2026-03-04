@@ -24,14 +24,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'SAVE_SHORT') {
     chrome.storage.local.get(['savedShorts'], (result) => {
       const shorts = result.savedShorts || [];
-      // Avoid duplicates by link
-      if (!shorts.some(s => s.link === message.data.link)) {
+      const existing = shorts.find(s => s.link === message.data.link && s.category === message.data.category);
+      if (existing) {
+        // Same link + same category: update details (thumbnail, name, channel)
+        existing.name = message.data.name || existing.name;
+        existing.channelName = message.data.channelName || existing.channelName;
+        existing.thumbnail = message.data.thumbnail || existing.thumbnail;
+        existing.savedAt = new Date().toISOString();
+        chrome.storage.local.set({ savedShorts: shorts }, () => {
+          sendResponse({ success: true, updated: true });
+        });
+      } else {
+        // Different category or new link: add as new entry
         shorts.push({ ...message.data, savedAt: new Date().toISOString() });
         chrome.storage.local.set({ savedShorts: shorts }, () => {
           sendResponse({ success: true });
         });
-      } else {
-        sendResponse({ success: false, reason: 'duplicate' });
       }
     });
     return true; // keep channel open for async sendResponse

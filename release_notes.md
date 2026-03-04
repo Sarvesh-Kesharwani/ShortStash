@@ -61,3 +61,9 @@
 - Removed Name and Channel columns for a cleaner, more visual layout
 - Existing YouTube videos without stored thumbnails get thumbnails via URL derivation
 - Fallback placeholder icon shown when no thumbnail is available
+
+## v1.3.1 — Smart Duplicate Handling
+
+- Re-saving the same video to the same category now updates its details (thumbnail, name, channel) instead of blocking
+- Saving the same video to a different category is now allowed, creating a separate entry
+- Shows "Updated!" toast when an existing entry is refreshed
