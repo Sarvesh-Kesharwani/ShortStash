@@ -51,3 +51,4 @@
 - Uncategorized videos now show a red badge that is clickable
 - Clicking it opens a dropdown to reassign the video to any existing category
 - Uncategorized tab appears in the filter bar when such videos exist
+- All category badges in the table are now clickable to reassign any video to a different category

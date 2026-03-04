@@ -292,10 +292,7 @@ function renderTable() {
       <td><span class="video-name" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</span></td>
       <td><span class="channel-name" title="${escapeAttr(s.channelName)}">${escapeHtml(s.channelName)}</span></td>
       <td><span class="source-badge ${s.source}">${s.source === 'youtube' ? 'YT' : 'IG'}</span></td>
-      <td>${s.category === 'Uncategorized'
-        ? `<button class="category-badge uncategorized reassign-btn" data-link="${escapeAttr(s.link)}">${escapeHtml(s.category)}</button>`
-        : `<span class="category-badge">${escapeHtml(s.category)}</span>`
-      }</td>
+      <td><button class="category-badge reassign-btn ${s.category === 'Uncategorized' ? 'uncategorized' : ''}" data-link="${escapeAttr(s.link)}">${escapeHtml(s.category)}</button></td>
       <td><a href="${escapeAttr(s.link)}" target="_blank" class="video-link" title="${escapeAttr(s.link)}">Open</a></td>
       <td><span class="date-text">${formatDate(s.savedAt)}</span></td>
       <td style="text-align:center"><button class="delete-btn" data-link="${escapeAttr(s.link)}" title="Remove">
