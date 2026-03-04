@@ -13,3 +13,9 @@
 - Dark theme UI with purple (#6C5CE7) and green (#00B894) accent colors
 - Custom logo: bookmark with play button and green plus badge
 - SPA-aware: detects navigation changes on both YouTube and Instagram without page reload
+
+## v1.0.1 — Bug Fix
+
+- Fixed new category input not responding to Enter key on YouTube/Instagram (sites were capturing keyboard events)
+- Added blur handler so clicking outside the input also saves the new category and the video
+- Keyboard events now stop propagation to prevent platform interference

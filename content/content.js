@@ -159,7 +159,11 @@
         input.maxLength = 30;
         addBtn.replaceWith(input);
         input.focus();
-        input.addEventListener('keydown', (e) => {
+
+        // Stop propagation so YouTube/Instagram don't swallow key events
+        input.addEventListener('keydown', (e) => e.stopPropagation());
+        input.addEventListener('keyup', (e) => {
+          e.stopPropagation();
           if (e.key === 'Enter' && input.value.trim()) {
             const newCat = input.value.trim();
             chrome.runtime.sendMessage({ type: 'ADD_CATEGORY', category: newCat }, () => {
@@ -167,6 +171,16 @@
             });
           }
           if (e.key === 'Escape') {
+            input.replaceWith(addBtn);
+          }
+        });
+        input.addEventListener('blur', () => {
+          const val = input.value.trim();
+          if (val) {
+            chrome.runtime.sendMessage({ type: 'ADD_CATEGORY', category: val }, () => {
+              saveShort(shortInfo, val, overlay);
+            });
+          } else {
             input.replaceWith(addBtn);
           }
         });
