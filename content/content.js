@@ -67,11 +67,16 @@
       scope.querySelector('.ytd-channel-name a') ||
       document.querySelector('ytd-channel-name yt-formatted-string a');
 
+    // Thumbnail: derive from video ID
+    const videoId = link.match(/\/shorts\/([^/?]+)/)?.[1] || '';
+    const thumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
+
     return {
       source: 'youtube',
       link,
       name: nameEl ? nameEl.textContent.trim() : 'Untitled Short',
-      channelName: channelEl ? channelEl.textContent.trim() : 'Unknown Channel'
+      channelName: channelEl ? channelEl.textContent.trim() : 'Unknown Channel',
+      thumbnail
     };
   }
 
@@ -94,11 +99,30 @@
       document.querySelector('h1') ||
       document.querySelector('span[dir="auto"]._ap3a');
 
+    // Thumbnail: find the currently visible/playing video, not just any video on page
+    const thumbnail = (() => {
+      // Try to find the playing video first (most reliable for current reel)
+      const allVideos = [...document.querySelectorAll('video')];
+      const playingVideo = allVideos.find(v => !v.paused && v.currentTime > 0);
+      // Fall back to the video closest to viewport center
+      const visibleVideo = allVideos.find(v => {
+        const rect = v.getBoundingClientRect();
+        return rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2;
+      });
+      const bestVideo = playingVideo || visibleVideo || allVideos[0];
+      if (bestVideo && bestVideo.poster) return bestVideo.poster;
+      // Fall back to og:image (page-level, may be stale on SPA)
+      const ogImage = document.querySelector('meta[property="og:image"]');
+      if (ogImage && ogImage.content) return ogImage.content;
+      return '';
+    })();
+
     return {
       source: 'instagram',
       link,
       name: captionEl ? captionEl.textContent.trim().slice(0, 80) : 'Untitled Reel',
-      channelName: userEl ? userEl.textContent.trim() : 'Unknown User'
+      channelName: userEl ? userEl.textContent.trim() : 'Unknown User',
+      thumbnail
     };
   }
 

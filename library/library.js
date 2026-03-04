@@ -289,8 +289,7 @@ function renderTable() {
 
   tableBody.innerHTML = sorted.map((s, i) => `
     <tr>
-      <td><span class="video-name" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</span></td>
-      <td><span class="channel-name" title="${escapeAttr(s.channelName)}">${escapeHtml(s.channelName)}</span></td>
+      <td><div class="thumb-cell">${getThumbnailHtml(s)}</div></td>
       <td><span class="source-badge ${s.source}">${s.source === 'youtube' ? 'YT' : 'IG'}</span></td>
       <td><button class="category-badge reassign-btn ${s.category === 'Uncategorized' ? 'uncategorized' : ''}" data-link="${escapeAttr(s.link)}">${escapeHtml(s.category)}</button></td>
       <td><a href="${escapeAttr(s.link)}" target="_blank" class="video-link" title="${escapeAttr(s.link)}">Open</a></td>
@@ -352,6 +351,22 @@ function renderTable() {
       setTimeout(() => document.addEventListener('click', closeDropdown), 0);
     });
   });
+}
+
+function getThumbnailHtml(s) {
+  // Use stored thumbnail (captured at save time)
+  if (s.thumbnail) {
+    return `<img src="${escapeAttr(s.thumbnail)}" alt="" class="thumb-img" loading="lazy">`;
+  }
+  // Fallback for YouTube: derive from video ID
+  if (s.source === 'youtube') {
+    const ytMatch = s.link && s.link.match(/\/shorts\/([^/?]+)/);
+    if (ytMatch) {
+      return `<img src="https://i.ytimg.com/vi/${escapeAttr(ytMatch[1])}/hqdefault.jpg" alt="" class="thumb-img" loading="lazy">`;
+    }
+  }
+  // No thumbnail available — placeholder
+  return `<div class="thumb-placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16" fill="#555" stroke="none"/></svg></div>`;
 }
 
 function formatDate(isoStr) {

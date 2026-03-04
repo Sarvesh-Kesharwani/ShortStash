@@ -209,23 +209,39 @@ body {
 }
 
 /* Column widths */
-.col-name { width: 26%; }
-.col-channel { width: 16%; }
-.col-source { width: 8%; }
-.col-category { width: 14%; }
-.col-link { width: 8%; }
-.col-date { width: 14%; }
-.col-actions { width: 14%; text-align: center; }
+.col-thumb { width: 80px; }
+.col-source { width: 10%; }
+.col-category { width: 20%; }
+.col-link { width: 10%; }
+.col-date { width: 18%; }
+.col-actions { width: 10%; text-align: center; }
 
-/* Name */
-.video-name {
-  color: #eee;
-  font-weight: 500;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 240px;
+/* Thumbnail */
+.thumb-cell {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb-img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #16213e;
+}
+
+.thumb-placeholder {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #16213e;
+  border-radius: 6px;
+  border: 1px solid #2d2d52;
 }
 
 /* Link */
@@ -240,16 +256,6 @@ body {
 .video-link:hover {
   color: #6C5CE7;
   text-decoration: underline;
-}
-
-/* Channel */
-.channel-name {
-  color: #999;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 160px;
-  display: block;
 }
 
 /* Source badge */

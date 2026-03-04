@@ -52,3 +52,12 @@
 - Clicking it opens a dropdown to reassign the video to any existing category
 - Uncategorized tab appears in the filter bar when such videos exist
 - All category badges in the table are now clickable to reassign any video to a different category
+
+## v1.3.0 — Thumbnails in Library
+
+- Library table now shows video thumbnails in a compact 56×56px column
+- YouTube thumbnails derived automatically from the video ID
+- Instagram thumbnails captured from the video poster or og:image at save time
+- Removed Name and Channel columns for a cleaner, more visual layout
+- Existing YouTube videos without stored thumbnails get thumbnails via URL derivation
+- Fallback placeholder icon shown when no thumbnail is available
