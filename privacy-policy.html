@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — ShortStash</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #1a1a2e;
+      color: #ddd;
+      line-height: 1.7;
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #2e2e4e;
+    }
+
+    header img {
+      width: 48px;
+      height: 48px;
+    }
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #a29bfe;
+    }
+
+    header p {
+      font-size: 13px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #a29bfe;
+      margin: 36px 0 12px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 12px;
+    }
+
+    ul {
+      list-style: disc;
+      padding-left: 22px;
+      margin-bottom: 12px;
+    }
+
+    ul li {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #16213e;
+      border: 1px solid #2e2e4e;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #a29bfe;
+      margin-bottom: 24px;
+    }
+
+    .section {
+      background: #16213e;
+      border: 1px solid #2e2e4e;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+    }
+
+    a {
+      color: #a29bfe;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid #2e2e4e;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="icons/icon128.png" alt="ShortStash logo">
+      <div>
+        <h1>ShortStash</h1>
+        <p>Privacy Policy</p>
+      </div>
+    </header>
+
+    <div class="badge">Last updated: March 5, 2026</div>
+
+    <p>
+      ShortStash is a browser extension that lets you save and categorize YouTube Shorts and Instagram Reels.
+      This policy explains what data the extension accesses, how it is used, and your rights over it.
+    </p>
+
+    <div class="section">
+      <h2>1. Data We Collect</h2>
+      <p>ShortStash only stores data that you explicitly save. This includes:</p>
+      <ul>
+        <li>Video URLs of YouTube Shorts and Instagram Reels you save</li>
+        <li>Video titles and channel/creator names detected from the page</li>
+        <li>Thumbnail image URLs</li>
+        <li>Categories you create and assign to saved videos</li>
+        <li>Timestamps of when videos were saved</li>
+      </ul>
+      <p>No data is ever collected passively. The extension only captures information about a video when you actively click the save button.</p>
+    </div>
+
+    <div class="section">
+      <h2>2. Where Data Is Stored</h2>
+      <p>
+        All data is stored locally in your browser using the Chrome <code>storage.local</code> API.
+        It never leaves your device unless you choose to use the Google Drive backup feature.
+      </p>
+      <p>
+        If you enable Google Drive backup, your library data is exported as a JSON file and saved
+        directly to <strong>your own Google Drive account</strong> using the <code>drive.file</code>
+        scope — which limits access strictly to files created by ShortStash itself. No one else,
+        including the developer, can access your Drive or your backup file.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>3. Permissions Used</h2>
+      <ul>
+        <li>
+          <strong>storage</strong> — Saves your video library and settings locally in the browser.
+        </li>
+        <li>
+          <strong>activeTab</strong> — Reads the URL and page content of the currently active tab
+          only when you interact with the extension on YouTube or Instagram. No background tab
+          scanning occurs.
+        </li>
+        <li>
+          <strong>identity</strong> — Used solely for Google OAuth authentication when you choose
+          to connect Google Drive for backup/restore. Authentication is handled entirely by Google.
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>4. Google Drive Integration</h2>
+      <p>
+        The Google Drive backup feature is entirely optional. When used:
+      </p>
+      <ul>
+        <li>Authentication is performed via Google's official OAuth 2.0 flow.</li>
+        <li>Only the <code>drive.file</code> scope is requested, which restricts access to files
+          that ShortStash itself creates — the extension cannot read or modify any other files
+          in your Drive.</li>
+        <li>Your library data is stored as a single JSON file in your Drive. ShortStash never
+          reads, transmits, or processes this file on any server.</li>
+        <li>You can revoke access at any time from your
+          <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account permissions page</a>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>5. Data Sharing</h2>
+      <p>
+        ShortStash does not share, sell, rent, or transmit your data to any third party.
+        There are no analytics, tracking scripts, or remote servers involved. The extension
+        operates entirely client-side within your browser.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>6. Content Scripts</h2>
+      <p>
+        ShortStash injects a content script on YouTube and Instagram pages. This script:
+      </p>
+      <ul>
+        <li>Adds a "Save" button to Shorts and Reels pages.</li>
+        <li>Reads the current video's URL, title, and thumbnail only when you click Save.</li>
+        <li>Does not run on any other websites.</li>
+        <li>Does not track your browsing history or collect data in the background.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>7. Data Deletion</h2>
+      <p>You are in full control of your data:</p>
+      <ul>
+        <li>Delete individual saved videos from the library at any time.</li>
+        <li>Remove all data by uninstalling the extension (browser storage is cleared automatically).</li>
+        <li>Delete your Google Drive backup file directly from your Drive if you used that feature.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>8. Children's Privacy</h2>
+      <p>
+        ShortStash is not directed at children under the age of 13, and we do not knowingly collect
+        any information from children.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>9. Changes to This Policy</h2>
+      <p>
+        If this privacy policy changes, the updated version will be published here with a revised
+        "Last updated" date. Continued use of the extension after changes constitutes acceptance
+        of the updated policy.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>10. Contact</h2>
+      <p>
+        If you have questions or concerns about this privacy policy, please open an issue on the
+        project's GitHub repository.
+      </p>
+    </div>
+
+    <footer>
+      &copy; 2026 ShortStash. All rights reserved.
+    </footer>
+  </div>
+</body>
+</html>
